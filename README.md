@@ -7,12 +7,11 @@
           |         .     .                   .     .         |
                        .                         .
 
-A pure-erlang software synthesizer (or so).
-Uses aplay for output, so it only works on Linux.
+A pure-erlang software synthesizer (or so). Incomplete. Uses aplay for output. Only works on Linux.
 
 Doesn't that sound convincing?
 
-# Pitchfork
+## Pitchfork
     
     $ make shell
     <build output, eshell booting...>
