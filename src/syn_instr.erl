@@ -1,24 +1,22 @@
 -module(syn_instr).
--export([null/0, sin/1, square/1, noise/0]). 
+-export([run_instr/2]).
+
+-include("syn_records.hrl").
 
 -define(PI, 3.14159265).
 
-null() ->
-  fun (_T) -> 0.0 end.
+%% what it should look like
+%% #sin{freq = #sin{freq = 440.0, amp = 1.0}, amp = #pulse{freq = 200.0}}
 
-noise() ->
-  fun (_T) -> random:uniform() end.
+run_instr(_T, N) when is_float(N) ->
+  N;
+run_instr(T, #sin{freq = Freq, amp = A}) ->
+  run_instr(T, A) * math:sin(run_instr(T, Freq) * T * 2 * ?PI);
+run_instr(T, #square{freq = Freq, amp = A}) ->
+  run_instr(T, A) * sign(math:sin(run_instr(T, Freq) * T * 2 * ?PI));
+run_instr(T, #noise{amp = A}) ->
+  run_instr(T, A) * random:uniform().
 
-sin(Freq) when is_float(Freq) ->
-  fun (T) when is_float(T) -> 
-      math:sin(Freq * T * 2 * ?PI) 
-  end.
-
-square(Freq) when is_float(Freq) ->
-  fun (T) when is_float(T) ->
-      sign(math:sin(Freq * T * 2 * ?PI))
-  end.
-    
 -compile({inline, sign/1}).
 sign(X) when is_float(X), X >  0.0  -> 1.0;
 sign(X) when is_float(X), X == 0.0  -> 0.0;

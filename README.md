@@ -16,4 +16,6 @@ Doesn't that sound convincing?
     $ make shell
     <build output, eshell booting...>
     1> Syn = synth:start().
-    2> synth:set_instr(Syn, syn_instr:sin(440.0)).
+    2> rr("include/*").
+    <blah blah>
+    2> synth:set_instr(Syn, #sin{freq = 440.0}).

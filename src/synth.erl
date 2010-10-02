@@ -10,9 +10,9 @@
 start() ->
   start(?DEFAULT_ST).
 start(SinkType) ->
-  start(SinkType, ?DEFAULT_SR). 
+  start(SinkType, ?DEFAULT_SR).
 start(SinkType, SampleRate) ->
-  Renderer = syn_gen:start(syn_instr:null()),
+  Renderer = syn_gen:start(0.0),
   {ok, Sink} = syn_sink:start(SinkType, SampleRate, Renderer, ?DEFAULT_PL),
   #synth_engine{renderer = Renderer, sink = Sink}.
 
@@ -20,5 +20,5 @@ stop(#synth_engine{renderer = Ren, sink = Sink}) ->
   syn_sink:stop(Sink),
   syn_gen:stop(Ren).
 
-set_instr(#synth_engine{renderer = Ren}, Instr) ->  
+set_instr(#synth_engine{renderer = Ren}, Instr) ->
   syn_gen:set_instr(Ren, Instr).

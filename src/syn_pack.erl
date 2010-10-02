@@ -1,6 +1,6 @@
 -module(syn_pack).
 -export([gen/3, gen/4, silence/1, silence_sec/2]).
--export([length/1, length_ms/2, pcm/1]). 
+-export([length/1, length_ms/2, pcm/1]).
 -export([map/2]).
 
 %% @type packet() = {SampleRate, PCM}
@@ -29,15 +29,15 @@ silence_sec(SampleRate, Len) ->
 %% using the supplied function.
 %% @equiv gen(F, 0, Length, SampleRate)
 -compile({inline, gen/3}).
-gen(F, Len, SampleRate) -> gen(F, 0.0, Len, SampleRate).
+gen(Instr, Len, SampleRate) -> gen(Instr, 0.0, Len, SampleRate).
 
 %% Generate a packet of specified length (in samples)
 %% using the supplied function. Starting at Count.
 %% @spec gen(Function::function(), Count::integer(), Length::integer()) -> packet()
 -compile({inline, gen/4}).
-gen(Fun, Count, Len, SampleRate) ->
+gen(Instr, Count, Len, SampleRate) ->
   Delta = 1 / SampleRate,
-  {Len, gen_pcm(Fun, Count, Count + Len, Delta)}.
+  {Len, gen_pcm(Instr, Count, Count + Len, Delta)}.
 
 %% @doc
 %% Map a function over the pcm values of a packet.
@@ -49,14 +49,14 @@ map(Fun, {Len, Pcm}) ->
 %% Helper Functions
 %% @private
 -compile({inline, gen_pcm/4}).
-gen_pcm(Fun, From, To, Delta) ->
-  gen_pcm(Fun, From, To, Delta, <<>>). 
+gen_pcm(Instr, From, To, Delta) ->
+  gen_pcm(Instr, From, To, Delta, <<>>).
 
 %% @private
 -compile({inline, gen_pcm/5}).
-gen_pcm(_Fun, From, To, _Delta, Res) when From >= To ->
+gen_pcm(_Instr, From, To, _Delta, Res) when From >= To ->
   Res;
-gen_pcm(Fun, From, To, Delta, Res) ->
-  gen_pcm(Fun, From + Delta, To, Delta, 
-    <<Res/binary, (Fun(From)):32/float-little>>).
+gen_pcm(Instr, From, To, Delta, Res) ->
+  gen_pcm(Instr, From + Delta, To, Delta,
+    <<Res/binary, (syn_instr:run_instr(From, Instr)):32/float-little>>).
 
